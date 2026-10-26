@@ -1,0 +1,24 @@
+name: Quality
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+    permissions:
+      contents: read
+    name: Lint Checks
+    uses: jsandas/github-actions/.github/workflows/golang-lint.yml@e5a61b525d1de48822254c131169598482ba537d
+    with:
+      golangci_lint_version: v2.15.0
+
+  # security:
+  #   permissions:
+  #     contents: read
+  #     security-events: write
+  #   name: Security Checks
+  #   uses: jsandas/github-actions/.github/workflows/golang-security.yml@e5a61b525d1de48822254c131169598482ba537d
