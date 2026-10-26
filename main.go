@@ -1,3 +1,4 @@
+// Package main implements the Minecraft Bedrock broadcast relay.
 package main
 
 import (
@@ -14,8 +15,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/jsandas/minecraft-bedrock-broadcast-relay/raknet"
 	goraknet "github.com/sandertv/go-raknet"
+
+	"github.com/jsandas/minecraft-bedrock-broadcast-relay/raknet"
 )
 
 type Config struct {
@@ -192,7 +194,7 @@ func pollBackendStatus(cfg Config, status *ServerStatus, listenerPort int, stopC
 			}
 		}
 		if serverGUID == 0 {
-			serverGUID = rand.Int63()
+			serverGUID = rand.Int63() //nolint:gosec // server GUID does not require cryptographic randomness
 		}
 
 		// Rewrite advertised port numbers to match local listener port
@@ -265,14 +267,19 @@ func main() {
 	}
 	defer listener.Close()
 
-	actualPort := listener.LocalAddr().(*net.UDPAddr).Port
+	localUDPAddr, ok := listener.LocalAddr().(*net.UDPAddr)
+	if !ok {
+		_ = listener.Close()
+		log.Fatal("Failed to get local UDP address") //nolint:gocritic // defer is irrelevant; listener is explicitly closed above
+	}
+	actualPort := localUDPAddr.Port
 
 	stopCh := make(chan struct{})
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 
 	status := &ServerStatus{
-		serverGUID: rand.Int63(),
+		serverGUID: rand.Int63(), //nolint:gosec // server GUID does not require cryptographic randomness
 	}
 
 	// Start background status poller
