@@ -1,0 +1,14 @@
+services:
+  server:
+    image: ghcr.io/jsandas/minecraft-bedrock:latest
+    environment:
+      EULA_ACCEPT: "true"
+      AUTH_KEY: "supersecret"
+      CFG_SERVER_NAME: test_server
+      CFG_GAMEMODE: creative
+      CFG_LEVEL_NAME: test_server
+    ports:
+      - '8080:8080'
+      - '19133:19132/udp'
+    # volumes:
+    #   - $PWD/worlds:/opt/minecraft/worlds
