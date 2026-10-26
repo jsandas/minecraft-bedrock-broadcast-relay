@@ -1,0 +1,79 @@
+version: "2"
+
+formatters:
+  enable:
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/jsandas/minecraft-bedrock-broadcast-relay
+
+linters:
+  enable:
+    - copyloopvar        # detects loop variable copies (Go 1.22+)
+    - durationcheck      # catches two durations multiplied together
+    - errcheck           # unchecked errors
+    - errorlint          # error wrapping correctness
+    - gocheckcompilerdirectives # validates //go: directives
+    - goconst            # repeated strings that should be constants
+    - gocritic           # broad diagnostics for bugs, perf, and style
+    - gocyclo            # cyclomatic complexity
+    - godot              # comments should end with a period
+    - gosec              # security issues
+    - govet              # suspicious constructs (Printf mismatches, etc.)
+    - ineffassign        # assignments whose values are never used
+    - intrange           # for loops that could use integer range
+    - mirror             # wrong bytes/strings mirror patterns
+    - modernize          # suggests modern Go idioms
+    - nakedret           # naked returns in long functions
+    - nestif             # deeply nested if statements
+    - nilerr             # returns nil despite checking err != nil
+    - nolintlint         # ill-formed nolint directives
+    - perfsprint         # fmt.Sprintf replaceable with faster alternative
+    - predeclared        # shadows Go predeclared identifiers
+    - recvcheck          # inconsistent receiver types
+    - revive             # golint replacement
+    - staticcheck        # comprehensive static analysis
+    - unconvert          # unnecessary type conversions
+    - unparam            # unused function parameters
+    - unused             # unused constants, variables, functions, types
+    - wastedassign       # wasted assignment statements
+    - whitespace         # leading/trailing whitespace
+
+  settings:
+    errcheck:
+      check-type-assertions: true
+
+    funlen:
+      lines: 100
+      statements: 50
+
+    gocyclo:
+      min-complexity: 20
+
+    govet:
+      enable-all: true
+      disable:
+        - fieldalignment
+
+    nakedret:
+      max-func-lines: 0
+
+    nolintlint:
+      require-explanation: true
+      require-specific: true
+
+    perfsprint:
+      strconcat: false
+
+  exclusions:
+    presets:
+      - std-error-handling
+      - common-false-positives
+    rules:
+      - source: 'TODO'
+        linters: [ godot ]
+      - path: '_test\.go'
+        linters:
+          - errcheck
+          - gosec
