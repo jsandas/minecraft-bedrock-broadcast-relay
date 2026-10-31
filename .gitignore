@@ -31,4 +31,5 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
-/minecraft-bedrock-broadcast-relay
+/nethernet_relay
+/raknet_relay

@@ -1,11 +1,21 @@
-.PHONY: test test-integration test-unit build clean docker-up docker-down example quality fmt fmt-check go-mod-tidy lint lint-install help
+.PHONY: all test test-unit build build-raknet build-nethernet clean docker-up docker-down example example-nethernet quality fmt fmt-check go-mod-tidy lint lint-install help
+
+# Compose file used by the docker-up / docker-down targets
+COMPOSE_FILE ?= docker-compose.yaml
 
 # Default target
 all: build
 
-# Build the Minecraft Bedrock wrapper
-build:
-	go build -o minecraft-bedrock-broadcast-relay
+# Build both relays
+build: build-raknet build-nethernet
+
+# Build the RakNet relay (Bedrock before 26.60)
+build-raknet:
+	go build -o raknet_relay ./cmd/raknet_relay
+
+# Build the NetherNet relay (Bedrock 26.50+)
+build-nethernet:
+	go build -o nethernet_relay ./cmd/nethernet_relay
 
 # Run all tests and quality checks
 test: quality test-unit
@@ -13,13 +23,6 @@ test: quality test-unit
 # Run unit tests only
 test-unit:
 	@go test -v ./...
-
-# Run integration tests (requires docker compose)
-test-integration:
-	@echo "Waiting for services to be ready..."
-	@sleep 5
-	go test -v -tags integration ./integration_tests/...
-	@$(MAKE) docker-down
 
 # Start docker services
 docker-up:
@@ -31,7 +34,7 @@ docker-down:
 
 # Clean build artifacts
 clean:
-	rm -f minecraft-bedrock-broadcast-relay
+	rm -f raknet_relay nethernet_relay
 	go clean
 
 # Run linting with golangci-lint
@@ -71,23 +74,24 @@ fmt:
 quality: fmt-check go-mod-tidy lint
 	@echo "All code quality checks passed!"
 
-# Run example
-example: build
-	./minecraft-bedrock-broadcast-relay
+# Run the RakNet relay example
+example: build-raknet
+	./raknet_relay
+
+# Run the NetherNet relay example
+example-nethernet: build-nethernet
+	./nethernet_relay
 
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  build               - Build the Minecraft Bedrock wrapper"
-	@echo "  test                - Run all tests (quality checks + integration tests)"
+	@echo "  build               - Build both relays (raknet_relay, nethernet_relay)"
+	@echo "  build-raknet        - Build the RakNet relay (Bedrock before 26.60)"
+	@echo "  build-nethernet     - Build the NetherNet relay (Bedrock 26.50+)"
+	@echo "  test                - Run all tests (quality checks + unit tests)"
 	@echo "  test-unit           - Run unit tests"
-	@echo "  test-integration    - Run all integration tests (requires docker)"
-	@echo "  test-nginx-1-30-0   - Run Nginx 1.30.0 integration tests"
-	@echo "  test-nginx-1-2-9    - Run Nginx 1.2.9 integration tests"
-	@echo "  test-postfix        - Run Postfix STARTTLS integration tests"
-	@echo "  test-mariadb        - Run MariaDB TLS integration tests"
-	@echo "  docker-up           - Start integration docker containers"
-	@echo "  docker-down         - Stop integration docker containers"
+	@echo "  docker-up           - Start docker containers (COMPOSE_FILE)"
+	@echo "  docker-down         - Stop docker containers (COMPOSE_FILE)"
 	@echo "  clean               - Clean build artifacts"
 	@echo ""
 	@echo "Code Quality:"
@@ -99,5 +103,6 @@ help:
 	@echo "  go-mod-tidy         - Check if go.mod is tidy"
 	@echo ""
 	@echo "Other:"
-	@echo "  example             - Run the example"
+	@echo "  example             - Build and run the RakNet relay"
+	@echo "  example-nethernet   - Build and run the NetherNet relay"
 	@echo "  help                - Show this help"
