@@ -140,7 +140,7 @@ func runNetherNet(cfg Config) {
 
 		switch pk.ID {
 		case nethernet.IDRequest:
-			r.handleRequest(from, pk)
+			r.handleRequest(from)
 		case nethernet.IDResponse:
 			r.handleResponse(from, pk)
 		case nethernet.IDMessage:
@@ -161,7 +161,7 @@ func (r *relay) send(to *net.UDPAddr, pk *nethernet.Packet) {
 	}
 }
 
-func (r *relay) handleRequest(from *net.UDPAddr, pk *nethernet.Packet) {
+func (r *relay) handleRequest(from *net.UDPAddr) {
 	r.backend.RLock()
 	data, id, fresh := r.backend.data, r.backend.id, r.backend.online && time.Since(r.backend.lastSeen) <= r.cfg.NNTTL
 	r.backend.RUnlock()
@@ -209,30 +209,41 @@ func (r *relay) handleMessage(from *net.UDPAddr, pk *nethernet.Packet) {
 	}
 
 	if r.isBackend(from) {
-		r.clientsMu.Lock()
-		c := r.clients[pk.RecipientID]
-		r.clientsMu.Unlock()
-		if c == nil {
-			log.Printf("[NetherNet] Backend message for unknown client %d (type %q) dropped", pk.RecipientID, kind)
-			return
-		}
+		r.handleBackendMessage(pk, kind)
+		return
+	}
+	r.handleClientMessage(from, pk, kind)
+}
 
-		data := pk.Data
-		if r.cfg.PublicIP != "" {
-			var n int
-			if data, n = nethernet.RewriteCandidates(data, r.cfg.PublicIP); n > 0 {
-				log.Printf("[NetherNet] Rewrote %d ICE candidate(s) to %s", n, r.cfg.PublicIP)
-			}
-		}
-		log.Printf("[NetherNet] backend -> client %s: %q (%d bytes)", c.addr, kind, len(data))
-		if kind != "" && kind != "Ping" {
-			log.Printf("[NetherNet]   %s", strings.ReplaceAll(strings.TrimSpace(data), "\r\n", " | "))
-		}
-		r.send(c.addr, &nethernet.Packet{ID: nethernet.IDMessage, SenderID: pk.SenderID, RecipientID: pk.RecipientID, Data: data})
+// handleBackendMessage routes a signaling message from the backend to the
+// client it is addressed to, rewriting ICE candidates if configured.
+func (r *relay) handleBackendMessage(pk *nethernet.Packet, kind string) {
+	r.clientsMu.Lock()
+	c := r.clients[pk.RecipientID]
+	r.clientsMu.Unlock()
+	if c == nil {
+		log.Printf("[NetherNet] Backend message for unknown client %d (type %q) dropped", pk.RecipientID, kind)
 		return
 	}
 
-	// From a client. Sender 0 messages are keepalives with no usable identity.
+	data := pk.Data
+	if r.cfg.PublicIP != "" {
+		var n int
+		if data, n = nethernet.RewriteCandidates(data, r.cfg.PublicIP); n > 0 {
+			log.Printf("[NetherNet] Rewrote %d ICE candidate(s) to %s", n, r.cfg.PublicIP)
+		}
+	}
+	log.Printf("[NetherNet] backend -> client %s: %q (%d bytes)", c.addr, kind, len(data))
+	if kind != "" && kind != "Ping" {
+		log.Printf("[NetherNet]   %s", strings.ReplaceAll(strings.TrimSpace(data), "\r\n", " | "))
+	}
+	r.send(c.addr, &nethernet.Packet{ID: nethernet.IDMessage, SenderID: pk.SenderID, RecipientID: pk.RecipientID, Data: data})
+}
+
+// handleClientMessage records the client's address and forwards its
+// signaling message to the backend.
+func (r *relay) handleClientMessage(from *net.UDPAddr, pk *nethernet.Packet, kind string) {
+	// Sender 0 messages are keepalives with no usable identity.
 	if pk.SenderID == 0 {
 		return
 	}

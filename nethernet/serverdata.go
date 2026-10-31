@@ -51,9 +51,9 @@ func ParseServerData(b []byte) (*ServerData, error) {
 		}
 	}
 	for _, f := range []*bool{&d.EditorWorld, &d.Hardcore, &d.AcceptsOnlineAuth, &d.AcceptsSelfSignedAuth} {
-		c, err := r.ReadByte()
-		if err != nil {
-			return nil, err
+		c, readErr := r.ReadByte()
+		if readErr != nil {
+			return nil, readErr
 		}
 		*f = c != 0
 	}
@@ -86,7 +86,7 @@ func readVarint32(r *bytes.Reader) (int32, error) {
 	if err != nil {
 		return 0, err
 	}
-	v := int32(u >> 1) //nolint:gosec // zigzag decode
+	v := int32(u >> 1)
 	if u&1 != 0 {
 		v = ^v
 	}
