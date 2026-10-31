@@ -3,12 +3,15 @@ services:
     image: ghcr.io/jsandas/minecraft-bedrock:latest
     environment:
       EULA_ACCEPT: "true"
+      PORT: "19132"
       AUTH_KEY: "supersecret"
       CFG_SERVER_NAME: test_server
       CFG_GAMEMODE: creative
       CFG_LEVEL_NAME: test_server
     ports:
       - '8080:8080'
-      - '19133:19132/udp'
+      - '19132:19132'  # NetherNet signaling & handshake
+      - '19132:19132/udp'  # NetherNet data transport (configured via server-udp-ports)
+      - '7551:7551/udp'
     # volumes:
     #   - $PWD/worlds:/opt/minecraft/worlds

@@ -1,11 +1,14 @@
-.PHONY: test test-integration test-unit build clean docker-up docker-down example quality fmt fmt-check go-mod-tidy lint lint-install help
+.PHONY: all test test-unit build clean docker-up docker-down example quality fmt fmt-check go-mod-tidy lint lint-install help
+
+# Compose file used by the docker-up / docker-down targets
+COMPOSE_FILE ?= docker-compose.yaml
 
 # Default target
 all: build
 
-# Build the Minecraft Bedrock wrapper
+# Build the NetherNet relay
 build:
-	go build -o minecraft-bedrock-broadcast-relay
+	go build -o nethernet_relay ./cmd/nethernet_relay
 
 # Run all tests and quality checks
 test: quality test-unit
@@ -13,13 +16,6 @@ test: quality test-unit
 # Run unit tests only
 test-unit:
 	@go test -v ./...
-
-# Run integration tests (requires docker compose)
-test-integration:
-	@echo "Waiting for services to be ready..."
-	@sleep 5
-	go test -v -tags integration ./integration_tests/...
-	@$(MAKE) docker-down
 
 # Start docker services
 docker-up:
@@ -31,7 +27,7 @@ docker-down:
 
 # Clean build artifacts
 clean:
-	rm -f minecraft-bedrock-broadcast-relay
+	rm -f nethernet_relay
 	go clean
 
 # Run linting with golangci-lint
@@ -71,23 +67,18 @@ fmt:
 quality: fmt-check go-mod-tidy lint
 	@echo "All code quality checks passed!"
 
-# Run example
+# Run the relay example
 example: build
-	./minecraft-bedrock-broadcast-relay
+	./nethernet_relay
 
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  build               - Build the Minecraft Bedrock wrapper"
-	@echo "  test                - Run all tests (quality checks + integration tests)"
+	@echo "  build               - Build the NetherNet relay (nethernet_relay)"
+	@echo "  test                - Run all tests (quality checks + unit tests)"
 	@echo "  test-unit           - Run unit tests"
-	@echo "  test-integration    - Run all integration tests (requires docker)"
-	@echo "  test-nginx-1-30-0   - Run Nginx 1.30.0 integration tests"
-	@echo "  test-nginx-1-2-9    - Run Nginx 1.2.9 integration tests"
-	@echo "  test-postfix        - Run Postfix STARTTLS integration tests"
-	@echo "  test-mariadb        - Run MariaDB TLS integration tests"
-	@echo "  docker-up           - Start integration docker containers"
-	@echo "  docker-down         - Stop integration docker containers"
+	@echo "  docker-up           - Start docker containers (COMPOSE_FILE)"
+	@echo "  docker-down         - Stop docker containers (COMPOSE_FILE)"
 	@echo "  clean               - Clean build artifacts"
 	@echo ""
 	@echo "Code Quality:"
@@ -99,5 +90,5 @@ help:
 	@echo "  go-mod-tidy         - Check if go.mod is tidy"
 	@echo ""
 	@echo "Other:"
-	@echo "  example             - Run the example"
+	@echo "  example             - Build and run the relay"
 	@echo "  help                - Show this help"
