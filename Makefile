@@ -1,4 +1,4 @@
-.PHONY: all test test-unit build build-raknet build-nethernet clean docker-up docker-down example example-nethernet quality fmt fmt-check go-mod-tidy lint lint-install help
+.PHONY: all test test-unit build clean docker-up docker-down example quality fmt fmt-check go-mod-tidy lint lint-install help
 
 # Compose file used by the docker-up / docker-down targets
 COMPOSE_FILE ?= docker-compose.yaml
@@ -6,15 +6,8 @@ COMPOSE_FILE ?= docker-compose.yaml
 # Default target
 all: build
 
-# Build both relays
-build: build-raknet build-nethernet
-
-# Build the RakNet relay (Bedrock before 26.60)
-build-raknet:
-	go build -o raknet_relay ./cmd/raknet_relay
-
-# Build the NetherNet relay (Bedrock 26.50+)
-build-nethernet:
+# Build the NetherNet relay
+build:
 	go build -o nethernet_relay ./cmd/nethernet_relay
 
 # Run all tests and quality checks
@@ -34,7 +27,7 @@ docker-down:
 
 # Clean build artifacts
 clean:
-	rm -f raknet_relay nethernet_relay
+	rm -f nethernet_relay
 	go clean
 
 # Run linting with golangci-lint
@@ -74,20 +67,14 @@ fmt:
 quality: fmt-check go-mod-tidy lint
 	@echo "All code quality checks passed!"
 
-# Run the RakNet relay example
-example: build-raknet
-	./raknet_relay
-
-# Run the NetherNet relay example
-example-nethernet: build-nethernet
+# Run the relay example
+example: build
 	./nethernet_relay
 
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  build               - Build both relays (raknet_relay, nethernet_relay)"
-	@echo "  build-raknet        - Build the RakNet relay (Bedrock before 26.60)"
-	@echo "  build-nethernet     - Build the NetherNet relay (Bedrock 26.50+)"
+	@echo "  build               - Build the NetherNet relay (nethernet_relay)"
 	@echo "  test                - Run all tests (quality checks + unit tests)"
 	@echo "  test-unit           - Run unit tests"
 	@echo "  docker-up           - Start docker containers (COMPOSE_FILE)"
@@ -103,6 +90,5 @@ help:
 	@echo "  go-mod-tidy         - Check if go.mod is tidy"
 	@echo ""
 	@echo "Other:"
-	@echo "  example             - Build and run the RakNet relay"
-	@echo "  example-nethernet   - Build and run the NetherNet relay"
+	@echo "  example             - Build and run the relay"
 	@echo "  help                - Show this help"
