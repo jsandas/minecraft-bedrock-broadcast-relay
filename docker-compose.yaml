@@ -1,17 +1,13 @@
 services:
   server:
-    image: ghcr.io/jsandas/minecraft-bedrock:latest
+    image: ghcr.io/jsandas/nethernet_relay:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
-      EULA_ACCEPT: "true"
-      PORT: "19132"
-      AUTH_KEY: "supersecret"
-      CFG_SERVER_NAME: test_server
-      CFG_GAMEMODE: creative
-      CFG_LEVEL_NAME: test_server
+      NN_REMOTE_ADDR: "10.4.10.130:7551"
+      NN_LISTEN_ADDR: "0.0.0.0:7551"
+      NN_PUBLIC_IP: "10.4.10.130"
     ports:
-      - '8080:8080'
-      - '19132:19132'  # NetherNet signaling & handshake
-      - '19132:19132/udp'  # NetherNet data transport (configured via server-udp-ports)
       - '7551:7551/udp'
-    # volumes:
-    #   - $PWD/worlds:/opt/minecraft/worlds
+    network_mode: "bridge"

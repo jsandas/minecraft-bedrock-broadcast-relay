@@ -1,3 +1,3 @@
 module github.com/jsandas/minecraft-bedrock-broadcast-relay
 
-go 1.23
+go 1.27
