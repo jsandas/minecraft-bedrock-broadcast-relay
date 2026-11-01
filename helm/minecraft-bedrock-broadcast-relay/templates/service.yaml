@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "minecraft-bedrock-broadcast-relay.fullname" . }}
+  labels:
+    {{- include "minecraft-bedrock-broadcast-relay.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- if eq .Values.service.type "LoadBalancer" }}
+  loadBalancerIP: {{ default "" .Values.service.loadBalancerIP }}
+  loadBalancerClass: {{ default "" .Values.service.loadBalancerClass }}
+  {{- end }}
+  ports:
+    - name: relay
+      port: {{ .Values.service.port }}
+      targetPort: relay
+      protocol: UDP
+  selector:
+    {{- include "minecraft-bedrock-broadcast-relay.selectorLabels" . | nindent 4 }}

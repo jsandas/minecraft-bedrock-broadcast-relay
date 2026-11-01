@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/jsandas/nethernet_relay:latest
+    image: ghcr.io/jsandas/minecraft-bedrock-broadcast-relay
     build:
       context: .
       dockerfile: Dockerfile

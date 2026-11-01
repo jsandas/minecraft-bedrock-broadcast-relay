@@ -29,20 +29,20 @@ Discovery packets are encrypted (AES-ECB, key = SHA-256 of `0xdeadbeef`) and car
 
 ## Build
 
-Prerequisites: Go 1.23 or newer.
+Prerequisites: Go 1.27 or newer.
 
 ```bash
 git clone https://github.com/jsandas/minecraft-bedrock-broadcast-relay.git
 cd minecraft-bedrock-broadcast-relay
-make build            # builds ./nethernet_relay
+make build            # builds .//minecraft-bedrock-broadcast-relay
 # or directly:
-go build -o nethernet_relay ./cmd/nethernet_relay
+go build -o /minecraft-bedrock-broadcast-relay ./cmd/nethernet_relay
 ```
 
 ## Usage
 
 ```bash
-./nethernet_relay -remote 10.4.10.113:7551
+.//minecraft-bedrock-broadcast-relay -remote 10.4.10.113:7551
 ```
 
 | Flag | Env Variable | Default | Description |
@@ -81,25 +81,10 @@ This was verified by blocking container-originated UDP to the client with an ipt
 The relay must receive LAN broadcasts, so it needs host networking on a machine on the clients' LAN:
 
 ```bash
-docker build -t nethernet-relay .
-docker run -d --name nethernet-relay --restart unless-stopped --net=host \
+docker build -t minecraft-bedrock-broadcast-relay .
+docker run -d --name minecraft-bedrock-broadcast-relay --restart unless-stopped --net=host \
   -e NN_REMOTE_ADDR="10.4.10.113:7551" \
-  nethernet-relay
-```
-
-Example `Dockerfile`:
-
-```dockerfile
-FROM golang:1.23-alpine AS builder
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /relay ./cmd/nethernet_relay
-
-FROM alpine:latest
-COPY --from=builder /relay /relay
-ENTRYPOINT ["/relay"]
+  minecraft-bedrock-broadcast-relay
 ```
 
 ## Server container (example)
