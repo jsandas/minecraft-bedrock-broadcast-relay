@@ -34,9 +34,9 @@ Prerequisites: Go 1.27 or newer.
 ```bash
 git clone https://github.com/jsandas/minecraft-bedrock-broadcast-relay.git
 cd minecraft-bedrock-broadcast-relay
-make build            # builds .//minecraft-bedrock-broadcast-relay
+make build            # builds ./minecraft-bedrock-broadcast-relay
 # or directly:
-go build -o /minecraft-bedrock-broadcast-relay ./cmd/nethernet_relay
+go build -o minecraft-bedrock-broadcast-relay ./cmd/nethernet_relay
 ```
 
 ## Usage

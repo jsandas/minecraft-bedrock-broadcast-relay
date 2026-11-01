@@ -8,7 +8,7 @@ all: build
 
 # Build the NetherNet relay
 build:
-	go build -o nethernet_relay ./cmd/nethernet_relay
+	go build -o minecraft-bedrock-broadcast-relay ./cmd/nethernet_relay
 
 # Run all tests and quality checks
 test: quality test-unit
@@ -27,7 +27,7 @@ docker-down:
 
 # Clean build artifacts
 clean:
-	rm -f nethernet_relay
+	rm -f minecraft-bedrock-broadcast-relay
 	go clean
 
 # Run linting with golangci-lint
@@ -69,7 +69,7 @@ quality: fmt-check go-mod-tidy lint
 
 # Run the relay example
 example: build
-	./nethernet_relay
+	./minecraft-bedrock-broadcast-relay
 
 # Show help
 help:
