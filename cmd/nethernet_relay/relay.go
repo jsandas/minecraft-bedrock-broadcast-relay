@@ -7,16 +7,24 @@ import (
 	"crypto/rand"
 	"encoding/binary"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"os/signal"
+	"runtime"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
 
 	"github.com/jsandas/minecraft-bedrock-broadcast-relay/nethernet"
+)
+
+var (
+	Version   = "main"
+	CommitSHA = "none"
+	BuildTime = "unknown"
 )
 
 // Config holds the relay settings.
@@ -73,12 +81,19 @@ func getEnv(key, defaultVal string) string {
 
 func main() {
 	var cfg Config
+	showVersion := flag.Bool("version", false, "Print version information and exit")
+
 	flag.StringVar(&cfg.NNRemoteAddr, "remote", getEnv("NN_REMOTE_ADDR", "10.4.10.222:7551"), "NetherNet backend discovery address (host:port)")
 	flag.StringVar(&cfg.NNListenAddr, "listen", getEnv("NN_LISTEN_ADDR", "0.0.0.0:7551"), "Local UDP address for NetherNet LAN discovery")
 	flag.DurationVar(&cfg.PingInterval, "ping-interval", 5*time.Second, "Interval to refresh backend server status")
 	flag.DurationVar(&cfg.NNTTL, "ttl", 15*time.Second, "Stop answering discovery if the backend has been silent this long")
 	flag.StringVar(&cfg.PublicIP, "public-ip", getEnv("NN_PUBLIC_IP", ""), "IP clients should use for the backend's WebRTC traffic; rewrites ICE candidates from the backend (empty = leave unchanged)")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("%s version=%s commit=%s build_time=%s\n", runtime.Version(), Version, CommitSHA, BuildTime)
+		return
+	}
 
 	runNetherNet(cfg)
 }

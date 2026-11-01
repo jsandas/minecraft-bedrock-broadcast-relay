@@ -1,0 +1,6 @@
+apiVersion: v2
+name: minecraft-bedrock-broadcast-relay
+description: Helm chart for running minecraft bedrock broadcast relay server
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
