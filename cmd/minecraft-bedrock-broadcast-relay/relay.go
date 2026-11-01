@@ -1,4 +1,4 @@
-// Command nethernet_relay answers NetherNet LAN discovery requests on behalf of a
+// Command minecraft-bedrock-broadcast-relay answers NetherNet LAN discovery requests on behalf of a
 // backend that is reachable by unicast but cannot broadcast, and forwards the
 // WebRTC signaling messages between LAN clients and that backend.
 package main
