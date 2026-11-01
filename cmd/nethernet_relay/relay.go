@@ -90,10 +90,10 @@ func main() {
 	flag.StringVar(&cfg.PublicIP, "public-ip", getEnv("NN_PUBLIC_IP", ""), "IP clients should use for the backend's WebRTC traffic; rewrites ICE candidates from the backend (empty = leave unchanged)")
 	flag.Parse()
 
-    if *showVersion {
-        fmt.Printf("%s version=%s commit=%s build_time=%s\n", runtime.Version(), Version, CommitSHA, BuildTime)
-        return
-    }
+	if *showVersion {
+		fmt.Printf("%s version=%s commit=%s build_time=%s\n", runtime.Version(), Version, CommitSHA, BuildTime)
+		return
+	}
 
 	runNetherNet(cfg)
 }
