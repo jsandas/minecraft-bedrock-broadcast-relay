@@ -12,12 +12,12 @@ RUN go build -ldflags "-s -w \
     -X 'main.Version=${VERSION}' \
     -X 'main.CommitSHA=${COMMIT_SHA}' \
     -X 'main.BuildTime=${BUILD_TIME}'" \
-    -o nethernet_relay ./cmd/nethernet_relay
+    -o minecraft-bedrock-broadcast-relay ./cmd/minecraft-bedrock-broadcast-relay
 
 FROM gcr.io/distroless/base-debian13:nonroot@sha256:f9518b74815721f537a7458cc693b4406208c04fce23bbffab511516117f34fd
 
-COPY --from=builder /go/src/nethernet_relay /nethernet_relay
+COPY --from=builder /go/src/minecraft-bedrock-broadcast-relay /minecraft-bedrock-broadcast-relay
 
 EXPOSE 7551/udp
 
-ENTRYPOINT ["/nethernet_relay"]
+ENTRYPOINT ["/minecraft-bedrock-broadcast-relay"]

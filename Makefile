@@ -8,7 +8,7 @@ all: build
 
 # Build the NetherNet relay
 build:
-	go build -o minecraft-bedrock-broadcast-relay ./cmd/nethernet_relay
+	go build -o minecraft-bedrock-broadcast-relay ./cmd/minecraft-bedrock-broadcast-relay
 
 # Run all tests and quality checks
 test: quality test-unit
@@ -74,7 +74,7 @@ example: build
 # Show help
 help:
 	@echo "Available targets:"
-	@echo "  build               - Build the NetherNet relay (nethernet_relay)"
+	@echo "  build               - Build the Minecraft Bedrock Broadcast relay (minecraft-bedrock-broadcast-relay)"
 	@echo "  test                - Run all tests (quality checks + unit tests)"
 	@echo "  test-unit           - Run unit tests"
 	@echo "  docker-up           - Start docker containers (COMPOSE_FILE)"
